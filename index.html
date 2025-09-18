@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Y2M</title>
+  <style>
+    :root{
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --radius: 18px;
+      /* Light */
+      --bg:#f7f3e9; --surface:#fff; --text:#122033; --muted:#6b7b8c; --accent:#c8a857; --line:#e6e0d2;
+      --shadow:0 10px 28px rgba(3,16,32,.10);
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220; --surface:#0f172a; --text:#e6e9ef; --muted:#9aa4b2; --accent:#d3b86e; --line:#1d2740;
+      --shadow:0 14px 34px rgba(0,0,0,.45);
+    }
+    @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;} }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;scroll-behavior:smooth}
+    img{max-width:100%;display:block} a{text-decoration:none;color:inherit}
+    .grid{position:fixed;inset:0;z-index:-3;pointer-events:none;background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg, rgba(0,0,0,.06) 1px,transparent 1px);background-size:28px 28px;opacity:.06;mix-blend-mode:multiply}
+    [data-theme="dark"] .grid{opacity:.08}
+    .blobs{position:fixed;inset:-20% -10% -10% -10%;z-index:-4;filter:blur(60px);opacity:.55}
+    .blob{position:absolute;width:42vmax;height:42vmax;border-radius:50%;mix-blend-mode:multiply}
+    .b1{left:-5%;top:0;background:radial-gradient(circle at 35% 30%, #ffd56b 0%, transparent 60%);animation:float 24s ease-in-out infinite}
+    .b2{right:-10%;top:10%;background:radial-gradient(circle at 70% 40%, #9fb7d3 0%, transparent 60%);animation:float 30s ease-in-out infinite reverse}
+    @keyframes float{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(2%,-2%,0) scale(1.03)}100%{transform:translate3d(0,0,0) scale(1)}}
+
+    .skip{position:absolute;left:-9999px}
+    .skip:focus{left:16px;top:12px;background:var(--surface);color:var(--text);padding:8px 12px;border-radius:10px;box-shadow:var(--shadow)}
+    .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    [data-theme="dark"] .nav{background:rgba(15,23,42,.55)}
+    .nav-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg, var(--accent), #937f3b)}
+    .links{display:flex;gap:16px;align-items:center}
+    .links a{padding:8px 10px;border-radius:10px}
+    .links a.active,.links a:hover{background:var(--surface);box-shadow:var(--shadow)}
+    .actions{display:flex;gap:10px}
+    .btn{border:1px solid var(--line);background:var(--surface);padding:10px 14px;border-radius:14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,box-shadow .2s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn.primary{background:linear-gradient(135deg, var(--accent), #b59c54);color:#0b0b0b;border-color:transparent}
+    .eq{display:inline-flex;gap:2px;margin-right:8px}
+    .eq i{display:block;width:3px;height:8px;background:currentColor;opacity:.7;border-radius:2px;transform-origin:bottom}
+    body.is-playing #soundBtn .eq i:nth-child(1){animation:bar .6s ease-in-out infinite}
+    body.is-playing #soundBtn .eq i:nth-child(2){animation:bar .5s ease-in-out infinite .1s}
+    body.is-playing #soundBtn .eq i:nth-child(3){animation:bar .7s ease-in-out infinite .2s}
+    @keyframes bar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+
+    section{max-width:1120px;margin:0 auto;padding:64px 20px}
+    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    h1{font-size:clamp(32px,6vw,56px);line-height:1.1;margin:0 0 10px}
+    .muted{color:var(--muted)}
+    .about{display:grid;grid-template-columns:1fr 1.1fr;gap:24px;align-items:center}
+    .photo{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .projects{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);transition:transform .25s, box-shadow .25s}
+    .card:hover{transform:translateY(-4px)} .card h3{margin:8px 0 6px;font-size:18px}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted)}
+    .contact form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .contact form .full{grid-column:1 / -1}
+    input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+    textarea{min-height:120px;resize:vertical}
+    footer{border-top:1px solid var(--line);text-align:center;padding:28px 20px;color:var(--muted)}
+
+    .glow-ambient{position:relative}
+    .glow-ambient::after{content:"";position:absolute;inset:-2px;border-radius:inherit;box-shadow:0 0 0 0 color-mix(in lab, var(--accent) 40%, transparent),0 0 48px color-mix(in lab, var(--accent) 22%, transparent);opacity:0;transition:opacity .35s, box-shadow .35s;pointer-events:none}
+    .glow-ambient:hover::after{opacity:1;box-shadow:0 0 0 1px color-mix(in lab, var(--accent) 55%, transparent),0 0 64px color-mix(in lab, var(--accent) 28%, transparent)}
+    .timbul{ text-shadow:0 1px 0 color-mix(in lab, var(--surface) 75%, transparent), 0 14px 24px rgba(0,0,0,.18) }
+
+    /* Marquee edge-to-edge */
+    .marquee{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:linear-gradient(to right, color-mix(in lab, var(--surface) 98%, transparent), transparent 70%)}
+    .marquee .flow{display:flex;width:200%;animation:flow 28s linear infinite}
+    .marquee .content{display:flex;gap:32px;align-items:center;white-space:nowrap;padding:8px 10px;width:50%}
+    @keyframes flow{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+
+    /* Scroll Animations */
+    [data-ani]{opacity:.001; transform:var(--init, translateY(12px)); transition:transform .8s cubic-bezier(.2,.8,.2,1), opacity .6s ease; will-change:transform,opacity}
+    [data-ani].in{opacity:1; transform:none}
+    [data-ani="fade-up"]{--init: translateY(14px)}
+    [data-ani="fade-down"]{--init: translateY(-14px)}
+    [data-ani="fade-left"]{--init: translateX(-18px)}
+    [data-ani="fade-right"]{--init: translateX(18px)}
+    [data-ani="pop"]{--init: scale(.96)}
+
+    /* Typewriter */
+    .type{display:inline-block; position:relative}
+    .caret{display:inline-block; width:1px; background:currentColor; margin-left:6px; animation:blink 1s steps(1) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    @media (max-width:980px){ .hero{grid-template-columns:1fr} .about{grid-template-columns:1fr} .projects{grid-template-columns:1fr 1fr} }
+    @media (max-width:640px){ .projects{grid-template-columns:1fr} .contact form{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#home">Lewati ke konten</a>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="blobs" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+  <nav class="nav">
+    <div class="nav-in">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span class="brand-name"><!-- GANTI: Nama Brand --> Je Micelle</span>
+      </div>
+      <div class="links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact Us</a>
+      </div>
+      <div class="actions">
+        <button class="btn" id="themeBtn" aria-label="Ubah tema">🌓 Tema</button>
+        <button class="btn primary" id="soundBtn" aria-label="Putar/Hentikan backsound"><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="txt">♪ Backsound</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-label="Pengumuman">
+    <div class="flow">
+      <div class="content">
+        <span>★ <!-- GANTI: teks berjalan --> Jemz </span>
+        <span>• <!-- GANTI: teks berjalan --> Micelle </span>
+        <span>• <!-- GANTI: teks berjalan --> Je Micelle </span>
+        <span>★ <!-- GANTI: teks berjalan --> Micellate </span>
+        <span>• <!-- GANTI: teks berjalan --> Jemzchive </span>
+        <span>• <!-- GANTI: teks berjalan --> M </span>
+        <span>• <!-- GANTI: teks berjalan --> Amink </span>
+        <span>• <!-- GANTI: teks berjalan --> Yasmine </span>
+      </div>
+      <div class="content" aria-hidden="true">
+        <span>★ Jemz </span><span>• Micelle </span><span>• Je Micelle </span><span>★ Micellate </span><span>• Jemzchive </span><span>• M </span><span>• Amink </span><span>• Yasmine </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="hero">
+    <div>
+      <h1 class="timbul" data-ani="fade-up">Hangker Plangker Tzy</h1>
+      <p class="muted" data-ani="fade-up" data-delay="80">
+        <span class="type"><span id="typeText"></span><span class="caret"></span></span>
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px" data-ani="fade-up" data-delay="140">
+        <a href="#projects" class="btn primary">Lihat Projects</a>
+        <a href="#contact" class="btn">Hubungi Kami</a>
+      </div>
+    </div>
+    <div class="panel glow-ambient" data-ani="fade-right">
+      <!-- GANTI: Gambar/ilustrasi hero -->
+      <img src="<!-- GANTI: URL gambar hero --> https://images.unsplash.com/photo-1545239351-1141bd82e8a6?q=80&w=1200&auto=format&fit=crop" alt="Hero visual" />
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="photo" data-ani="fade-right">
+      <!-- GANTI: Foto About -->
+      <img src="<!-- GANTI: URL foto about --> https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" alt="Tentang kami" />
+    </div>
+    <div data-ani="fade-left">
+      <h2 class="timbul">Tentang Kami</h2>
+      <p class="muted">CHEATER KULL ABIEZZZZ</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <span class="badge">Responsive</span><span class="badge">Accessible</span><span class="badge">Smooth Animations</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2 class="timbul" style="margin:0 0 12px">Projects</h2>
+    <p class="muted" style="margin-top:0">nanti dl.</p>
+    <div class="projects" data-stagger="120">
+      <article class="card glow-ambient" data-ani="pop">
+        <img src="<!-- GANTI: URL gambar project 1 --> https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" alt="Project 1" />
+        <h3><!-- GANTI: Nama Project 1 --> Project 1</h3>
+        <p class="muted">blm y</p>
+      </article>
+      <article class="card glow-ambient" data-ani="pop">
+        <img src="<!-- GANTI: URL gambar project 2 --> https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=1200&auto=format&fit=crop" alt="Project 2" />
+        <h3><!-- GANTI: Nama Project 2 --> Project 2</h3>
+        <p class="muted">blm jg.</p>
+      </article>
+      <article class="card glow-ambient" data-ani="pop">
+        <img src="<!-- GANTI: URL gambar project 3 --> https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop" alt="Project 3" />
+        <h3><!-- GANTI: Nama Project 3 --> Project 3</h3>
+        <p class="muted">hmz.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact">
+    <h2 class="timbul">Contact Us</h2>
+    <p class="muted">Isi form di bawah, atau email kami langsung.</p>
+    <p style="margin-top:4px"><strong>Email:</strong> <a href="mailto:jemzce@gmail.com">jemzce@gmail.com</a></p>
+
+    <form onsubmit="event.preventDefault(); alert('Pesan terkirim (demo).'); this.reset();">
+      <input type="text" name="nama" placeholder="Nama" required data-ani="fade-up" data-delay="0">
+      <input type="email" name="email" placeholder="Email" required data-ani="fade-up" data-delay="80">
+      <textarea class="full" name="pesan" placeholder="Pesan" required data-ani="fade-up" data-delay="160"></textarea>
+      <button class="btn primary full" type="submit" data-ani="fade-up" data-delay="240">Kirim</button>
+    </form>
+  </section>
+
+  <footer>© 2025 <span class="brand-name">Y2M</span>. Semua hak dilindungi.</footer>
+
+  <!-- BACKSOUND -->
+  <audio id="bgm" src="assets/backsound_converted.mp3" loop preload="auto"></audio>
+
+  <script>
+    // Tema
+    const root=document.documentElement, saved=localStorage.getItem('theme');
+    root.setAttribute('data-theme', saved || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+    document.getElementById('themeBtn').addEventListener('click', ()=>{
+      const t=root.getAttribute('data-theme')==='dark'?'light':'dark';
+      root.setAttribute('data-theme', t); localStorage.setItem('theme', t);
+    });
+
+    // Backsound + EQ
+    const bgm=document.getElementById('bgm'), soundBtn=document.getElementById('soundBtn'); let playing=false;
+    function tryPlay(){ bgm.volume=.25; bgm.play().then(()=>{ playing=true; document.body.classList.add('is-playing'); soundBtn.querySelector('.txt').textContent='■ Hentikan'; }).catch(()=>{}); }
+    document.addEventListener('click', function first(){ if(!playing) tryPlay(); document.removeEventListener('click', first, {capture:true}); }, {capture:true, once:true});
+    soundBtn.addEventListener('click', ()=>{ if(playing){ bgm.pause(); playing=false; document.body.classList.remove('is-playing'); soundBtn.querySelector('.txt').textContent='♪ Backsound'; } else { tryPlay(); } });
+
+    // Reveal on scroll
+    const io=new IntersectionObserver((es)=>{ es.forEach(x=>{ if(x.isIntersecting){ x.target.classList.add('in'); io.unobserve(x.target); } }); }, {threshold:.08, rootMargin:'0px 0px -10% 0px'});
+    document.querySelectorAll('[data-stagger]').forEach(p=>{
+      const step=parseInt(p.dataset.stagger,10)||120;
+      p.querySelectorAll(':scope > [data-ani]').forEach((el,i)=>{ const base=parseInt(el.dataset.delay||0); el.style.transitionDelay=(base+i*step)+'ms'; });
+    });
+    document.querySelectorAll('[data-ani]').forEach(el=> io.observe(el));
+
+    // Nav active
+    const ids=['home','about','projects','contact'], links=[...document.querySelectorAll('#navLinks a')];
+    function setActive(){ let cur=ids[0], y=scrollY+120; ids.forEach(id=>{ const el=document.getElementById(id); if(el&&el.offsetTop<=y) cur=id; }); links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+cur)); }
+    setActive(); addEventListener('scroll', setActive, {passive:true});
+
+
+    // Typewriter (paragraf "Independent woman" -> bisa ganti kata)
+    const words=[
+      "Independent woman",
+      "rawrr",
+      "y",
+      "hmz"
+    ];
+    const elType=document.getElementById('typeText');
+    let wi=0, ci=0, del=false;
+    function typeLoop(){
+      const w=words[wi];
+      elType.textContent=w.slice(0,ci);
+      if(!del && ci<w.length){ ci++; setTimeout(typeLoop,70); }
+      else if(!del && ci===w.length){ del=true; setTimeout(typeLoop,1200); }
+      else if(del && ci>0){ ci--; setTimeout(typeLoop,40); }
+      else { del=false; wi=(wi+1)%words.length; setTimeout(typeLoop,70); }
+    }
+    typeLoop();
+  </script>
+</body>
+</html>
